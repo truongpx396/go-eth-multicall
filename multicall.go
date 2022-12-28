@@ -125,6 +125,7 @@ func (caller *EthMultiCaller) Execute(calls []Call) map[string]CallResponse {
 	return results
 }
 
+// This function supports to get nativeBalance while querying other balances
 func (caller *EthMultiCaller) ExecuteBalances(calls []Call, userAddress string) map[string]CallResponse {
 	var responses []CallResponse
 
@@ -150,7 +151,7 @@ func (caller *EthMultiCaller) ExecuteBalances(calls []Call, userAddress string) 
 	// Unpack results
 	unpackedResp, _ := caller.Abi.Unpack("tryAggregateBalances", resp)
 
-	// nativeBalance := new(big.Int).SetBytes(unpackedResp[1])
+	// nativeBalance := unpackedResp[1].(big.Int)
 
 	a, err := json.Marshal(unpackedResp[0])
 	if err != nil {
@@ -167,6 +168,8 @@ func (caller *EthMultiCaller) ExecuteBalances(calls []Call, userAddress string) 
 	for i, response := range responses {
 		results[calls[i].Name] = response
 	}
+
+	results["nativeBalance"] = CallResponse{Success: true, ReturnData: []byte(unpackedResp[1].(string))}
 
 	return results
 }

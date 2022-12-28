@@ -3,6 +3,9 @@ package go_eth_multicall
 import (
 	"context"
 	"encoding/json"
+	"math/big"
+	"strings"
+
 	"github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -10,8 +13,6 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	MultiCall2 "github.com/trayvox/go-eth-multicall/contracts/MultiCall"
-	"math/big"
-	"strings"
 )
 
 type Call struct {
@@ -54,7 +55,7 @@ type EthMultiCaller struct {
 	ContractAddress common.Address
 }
 
-func New(rawurl string) EthMultiCaller {
+func New(rawurl, multilcalContractAddress string) EthMultiCaller {
 	client, err := ethclient.Dial(rawurl)
 	if err != nil {
 		panic(err)
@@ -66,7 +67,7 @@ func New(rawurl string) EthMultiCaller {
 		panic(err)
 	}
 
-	contractAddress := common.HexToAddress("0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696")
+	contractAddress := common.HexToAddress(multilcalContractAddress)
 
 	return EthMultiCaller{
 		Signer:          randomSigner(),

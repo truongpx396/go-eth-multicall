@@ -12,7 +12,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
-	MultiCall2 "github.com/trayvox/go-eth-multicall/contracts/MultiCall"
+	MultiCall2 "github.com/truongpx396/go-eth-multicall/contracts/MultiCall"
 )
 
 type Call struct {

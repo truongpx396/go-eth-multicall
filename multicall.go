@@ -120,3 +120,49 @@ func (caller *EthMultiCaller) Execute(calls []Call) map[string]CallResponse {
 
 	return results
 }
+
+func (caller *EthMultiCaller) ExecuteBalances(calls []Call, userAddress string) map[string]CallResponse {
+	var responses []CallResponse
+
+	var multiCalls = make([]MultiCall2.Multicall2Call, 0, len(calls))
+
+	// Add calls to multicall structure for the contract
+	for _, call := range calls {
+		multiCalls = append(multiCalls, call.GetMultiCall())
+	}
+
+	// Prepare calldata for multicall
+	callData, err := caller.Abi.Pack("tryAggregateBalances", false, multiCalls, common.HexToAddress(userAddress))
+	if err != nil {
+		panic(err)
+	}
+
+	// Perform multicall
+	resp, err := caller.Client.CallContract(context.Background(), ethereum.CallMsg{To: &caller.ContractAddress, Data: callData}, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	// Unpack results
+	unpackedResp, _ := caller.Abi.Unpack("tryAggregateBalances", resp)
+
+	// nativeBalance := new(big.Int).SetBytes(unpackedResp[1])
+
+	a, err := json.Marshal(unpackedResp[0])
+	if err != nil {
+		panic(err)
+	}
+
+	err = json.Unmarshal(a, &responses)
+	if err != nil {
+		panic(err)
+	}
+
+	// Create mapping for results. Be aware that we sometimes get two empty results initially, unsure why
+	results := make(map[string]CallResponse)
+	for i, response := range responses {
+		results[calls[i].Name] = response
+	}
+
+	return results
+}

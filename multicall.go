@@ -30,6 +30,10 @@ func (call Call) GetMultiCall() MultiCall2.Multicall2Call {
 	return MultiCall2.Multicall2Call{Target: call.Target, CallData: call.CallData}
 }
 
+func (call Call) GetCustomMultiCall() MultiCall2.CustomMulticall2Call {
+	return MultiCall2.CustomMulticall2Call{Target: call.Target, CallData: call.CallData}
+}
+
 func randomSigner() *bind.TransactOpts {
 	privateKey, err := crypto.GenerateKey()
 	if err != nil {
@@ -124,11 +128,11 @@ func (caller *EthMultiCaller) Execute(calls []Call) map[string]CallResponse {
 func (caller *EthMultiCaller) ExecuteBalances(calls []Call, userAddress string) map[string]CallResponse {
 	var responses []CallResponse
 
-	var multiCalls = make([]MultiCall2.Multicall2Call, 0, len(calls))
+	var multiCalls = make([]MultiCall2.CustomMulticall2Call, 0, len(calls))
 
 	// Add calls to multicall structure for the contract
 	for _, call := range calls {
-		multiCalls = append(multiCalls, call.GetMultiCall())
+		multiCalls = append(multiCalls, call.GetCustomMultiCall())
 	}
 
 	// Prepare calldata for multicall

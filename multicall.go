@@ -66,7 +66,7 @@ func New(rawurl, multilcalContractAddress string) EthMultiCaller {
 	}
 
 	// Load Multicall abi for later use
-	mcAbi, err := abi.JSON(strings.NewReader(MultiCall2.MultiCall2ABI))
+	mcAbi, err := abi.JSON(strings.NewReader(MultiCall2.MultiCallABI))
 	if err != nil {
 		panic(err)
 	}

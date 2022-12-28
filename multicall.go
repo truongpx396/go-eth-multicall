@@ -127,7 +127,7 @@ func (caller *EthMultiCaller) Execute(calls []Call) map[string]CallResponse {
 
 // This function supports to get nativeBalance while querying other balances
 func (caller *EthMultiCaller) ExecuteBalances(calls []Call, userAddress string) map[string]CallResponse {
-	var responses []CallResponse
+	var callResponses []CallResponse
 
 	var multiCalls = make([]MultiCall2.CustomMulticall2Call, 0, len(calls))
 
@@ -153,23 +153,28 @@ func (caller *EthMultiCaller) ExecuteBalances(calls []Call, userAddress string) 
 
 	// nativeBalance := unpackedResp[1].(big.Int)
 
-	a, err := json.Marshal(unpackedResp[0])
+	nativeBalanceRaw, err := json.Marshal(unpackedResp[1])
 	if err != nil {
 		panic(err)
 	}
 
-	err = json.Unmarshal(a, &responses)
+	callResponsesRaw, err := json.Marshal(unpackedResp[0])
+	if err != nil {
+		panic(err)
+	}
+
+	err = json.Unmarshal(callResponsesRaw, &callResponses)
 	if err != nil {
 		panic(err)
 	}
 
 	// Create mapping for results. Be aware that we sometimes get two empty results initially, unsure why
 	results := make(map[string]CallResponse)
-	for i, response := range responses {
+	for i, response := range callResponses {
 		results[calls[i].Name] = response
 	}
 
-	results["nativeBalance"] = CallResponse{Success: true, ReturnData: []byte(unpackedResp[1].(string))}
+	results["nativeBalance"] = CallResponse{Success: true, ReturnData: []byte(nativeBalanceRaw)}
 
 	return results
 }
